@@ -1,7 +1,7 @@
-# hbase-rule
+### hbase-rule
 JUnit rule which provides an embedded HBase server. It can be setup by custom configuration or default. The rule has also helper methods to work with hbase table and namespace such as create, delete, truncate and etc.
 
-# Sample Usage
+### Sample Usage
 
 ```
 private static final String NAME_SPACE = "builderNameSpace";
@@ -55,3 +55,6 @@ public void readAndWrite() throws Exception {
     Assert.assertEquals(1, hbaseRule.countRows(TABLE_ON_SETUP /*or TABLE_ON_BUILDER*/));
 }
 ```
+
+### Add it to your project
+You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
