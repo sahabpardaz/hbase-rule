@@ -58,9 +58,8 @@ public class HbaseRuleTest {
     private void checkWriteAndRead(String tableName) throws Exception {
 
         int numRecords = 100;
-        try (Connection hbaseConnection = createConnection(hbaseRule.getZKAddress(),
-                3000); Table table = hbaseConnection
-                .getTable(TableName.valueOf(tableName))) {
+        try (Connection hbaseConnection = createConnection(hbaseRule.getZKAddress(), 3000);
+                Table table = hbaseConnection.getTable(TableName.valueOf(tableName))) {
 
             // Put some data to hbase table.
             String prefixRowKey = "rowKey";
@@ -88,7 +87,7 @@ public class HbaseRuleTest {
         Assert.assertEquals(numRecords, hbaseRule.countRows(tableName));
     }
 
-    private Connection createConnection(String zkAddresses, int operationTimeout) throws IOException {
+    static Connection createConnection(String zkAddresses, int operationTimeout) throws IOException {
         // Create HBase client config
         Configuration hbaseConf = HBaseConfiguration.create();
         hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, zkAddresses);
