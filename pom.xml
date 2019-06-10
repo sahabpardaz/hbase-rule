@@ -25,6 +25,7 @@
             <artifactId>hadoop-minicluster</artifactId>
             <version>${cloudera.hadoop.version}</version>
             <scope>provided</scope>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j</artifactId>
@@ -37,6 +38,7 @@
             <artifactId>hbase-hadoop2-compat</artifactId>
             <version>${cloudera.hbase.version}</version>
             <type>test-jar</type>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j</artifactId>
@@ -49,6 +51,7 @@
             <artifactId>hbase-hadoop-compat</artifactId>
             <version>${cloudera.hbase.version}</version>
             <type>test-jar</type>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <artifactId>log4j</artifactId>
@@ -61,6 +64,7 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
             <version>${cloudera.hbase.version}</version>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <artifactId>hadoop-core</artifactId>
@@ -79,6 +83,7 @@
             <version>${cloudera.hbase.version}</version>
             <type>test-jar</type>
             <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
