@@ -65,6 +65,7 @@ public void test() throws Exception {
 ```
 
 ### Add it to your project
-note:
-The dependencies defined in the pom of this project, should be rewritten in the client pom. The user should define them with its appropriate choice of version. But he/she should note that he/she should define the server and minicluster dependencies in test scope.
+Notes:
+The dependencies defined in the pom of this project, should be rewritten in the client pom. The user should define them with its appropriate choice of version. But should define the server and minicluster dependencies in test scope.
+
 You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
