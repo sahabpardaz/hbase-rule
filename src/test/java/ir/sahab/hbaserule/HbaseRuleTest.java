@@ -77,8 +77,10 @@ public class HbaseRuleTest {
                 get.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes(qualifier));
                 Result result = table.get(get);
                 for (Cell cell : result.listCells()) {
-                    Assert.assertEquals(prefixRowKey + i, Bytes.toString(cell.getRow()));
-                    Assert.assertEquals(prefixValue + i, Bytes.toString(cell.getValue()));
+                    Assert.assertEquals(prefixRowKey + i,
+                            Bytes.toString(cell.getRowArray(), cell.getRowOffset(), cell.getRowLength()));
+                    Assert.assertEquals(prefixValue + i,
+                            Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
                 }
             }
         }
