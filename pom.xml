@@ -8,6 +8,13 @@
     <artifactId>hbase-rule</artifactId>
     <version>1.0</version>
 
+    <repositories>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
+    </repositories>
+
     <properties>
         <cloudera.hadoop.version>2.6.0-cdh5.10.2</cloudera.hadoop.version>
         <cloudera.hbase.version>1.2.0-cdh5.10.2</cloudera.hbase.version>
