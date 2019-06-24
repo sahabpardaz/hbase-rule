@@ -69,7 +69,7 @@ public void test() throws Exception {
 ### Add it to your project
 
 You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
-[![](https://jitpack.io/v/sahabpardaz/kafka-rule.svg)](https://jitpack.io/#sahabpardaz/hbase-rule)
+[![](https://jitpack.io/v/sahabpardaz/hbase-rule.svg)](https://jitpack.io/#sahabpardaz/hbase-rule)
 
 But note that you should rewrite all optional dependencies defined in [pom](pom.xml) in pom of your own project too. 
 That's because here we have defined dependencies as optional to avoid accidantally changing the type (*original* or *cloudera*, *normal* or *shaded*) and version of your hadoop dependencies. 
