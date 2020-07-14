@@ -3,13 +3,13 @@ JUnit HBase rule which provides an embedded HBase server. It can be setup by cus
 
 ### Sample Usage
 
-```
+```java
 @ClassRule
 public static HbaseRule hbaseRule = HbaseRule.newBuilder()
         .addNameSpace("namespace")
         .addTable("table", "cf")
         .build();
-        
+
 @Test
 public void test() throws Exception {
     try (Connection hbaseConnection = createConnection(hbaseRule.getZKAddress(), 3000);
@@ -37,7 +37,7 @@ public void test() throws Exception {
 ```
 
 It's also possible to define table on setup and delete the data on tearDown.
-```
+```java
 @BeforeClass
 public static void setUp() throws Exception {
     hbaseRule.createTable("table", "cf");
@@ -52,11 +52,11 @@ public void tearDown() throws Exception {
 
 This rule provide several helper methods such as countRows(), deleteTable(), truncateTable() and etc.
 
-```
+```java
 @Test
 public void test() throws Exception {
     ...
-    
+
     // You expect number of rows already put in HBase table.
     Assert.assertEquals(10 , hbaseRule.countRows("tableOnBuilder"));
     // Delete table data.
@@ -71,8 +71,8 @@ public void test() throws Exception {
 You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
 [![](https://jitpack.io/v/sahabpardaz/hbase-rule.svg)](https://jitpack.io/#sahabpardaz/hbase-rule)
 
-But note that you should rewrite all optional dependencies defined in [pom](pom.xml) in pom of your own project too. 
-That's because here we have defined dependencies as optional to avoid accidantally changing the type (*original* or *cloudera*, *normal* or *shaded*) and version of your hadoop dependencies. 
+But note that you should rewrite all optional dependencies defined in [pom](pom.xml) in pom of your own project too.
+That's because here we have defined dependencies as optional to avoid accidantally changing the type (*original* or *cloudera*, *normal* or *shaded*) and version of your hadoop dependencies.
 
 If you have used hadoop client libraries, you have already some hadoop dependencies in your project. Now you should provide some other dependencies for hadoop *server* and *test* libraries. Note that you should provide them with the same type and version but in *test* scope.
 
