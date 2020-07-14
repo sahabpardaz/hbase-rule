@@ -147,16 +147,32 @@ public class HbaseRule extends ExternalResource {
         utility.createTable(Bytes.toBytes(tableName), Bytes.toBytes(columnFamily)).close();
     }
 
+    public void createTable(String tableName, String columnFamily, int numVersions) throws IOException {
+        utility.createTable(Bytes.toBytes(tableName), Bytes.toBytes(columnFamily), numVersions).close();
+    }
+
     public void createTable(byte[] tableName, byte[] columnFamily) throws IOException {
         utility.createTable(TableName.valueOf(tableName), columnFamily).close();
+    }
+
+    public void createTable(byte[] tableName, byte[] columnFamily, int numVersions) throws IOException {
+        utility.createTable(TableName.valueOf(tableName), columnFamily, numVersions).close();
     }
 
     public void createTable(TableName tableName, byte[] columnFamily) throws IOException {
         utility.createTable(tableName, columnFamily).close();
     }
 
+    public void createTable(TableName tableName, byte[] columnFamily, int numVersions) throws IOException {
+        utility.createTable(tableName, columnFamily, numVersions).close();
+    }
+
     public void createTable(TableName tableName, byte[]... columnFamilies) throws IOException {
         utility.createTable(tableName, columnFamilies).close();
+    }
+
+    public void createTable(TableName tableName, byte[][] columnFamilies, int[] numVersions) throws IOException {
+        utility.createTable(tableName, columnFamilies, numVersions).close();
     }
 
     public void createTable(TableName tableName, String... columnFamilies) throws IOException {
