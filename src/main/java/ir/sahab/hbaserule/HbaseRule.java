@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.NamespaceDescriptor;
@@ -20,6 +21,7 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
+import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.rules.ExternalResource;
 
 /**
@@ -27,7 +29,7 @@ import org.junit.rules.ExternalResource;
  */
 public class HbaseRule extends ExternalResource {
 
-    private Map<String, String> customConfigs;
+    private Configuration configuration = HBaseConfiguration.create();
     private HBaseTestingUtility utility;
     private MiniZooKeeperCluster zkCluster;
     private File logDir;
@@ -44,25 +46,22 @@ public class HbaseRule extends ExternalResource {
 
     @Override
     protected void before() throws Throwable {
-        utility = new HBaseTestingUtility();
-        Configuration configuration = utility.getConfiguration();
+        // Set necessary HBase configuration items.
         configuration.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
-        if (customConfigs != null) {
-            customConfigs.forEach(configuration::set);
-        }
         // Set MASTER_INFO_PORT to a random open port instead of 60010 to avoid conflicts.
         configuration.set(HConstants.MASTER_INFO_PORT, String.valueOf(anOpenPort()));
+        int zkPort = anOpenPort();
+        configuration.set(HConstants.ZOOKEEPER_QUORUM, "localhost:" + zkPort);
 
         // Create ZooKeeper mini cluster
-        int port = anOpenPort();
         zkCluster = new MiniZooKeeperCluster();
-        zkCluster.addClientPort(port);
+        zkCluster.addClientPort(zkPort);
         logDir = Files.createTempDirectory("zk-log-dir").toFile();
         zkCluster.startup(logDir);
 
         // Create and start mini cluster
+        utility = new HBaseTestingUtility(configuration);
         utility.setZkCluster(zkCluster);
-        configuration.set(HConstants.ZOOKEEPER_QUORUM, "localhost:" + port);
         utility.startMiniCluster();
 
         // Create defined namespaces and tables.
@@ -113,6 +112,10 @@ public class HbaseRule extends ExternalResource {
 
     public HBaseTestingUtility getHBaseTestingUtility() {
         return utility;
+    }
+
+    public MiniDFSCluster getDfsCluster() {
+        return utility.getDFSCluster();
     }
 
     public Configuration getConfiguration() {
@@ -252,8 +255,18 @@ public class HbaseRule extends ExternalResource {
 
         HbaseRule hbaseRule = new HbaseRule();
 
+        public Builder setCustomConfig(String name, String value) {
+            hbaseRule.configuration.set(name, value);
+            return this;
+        }
+
+        public Builder setCustomConfig(String name, String... values) {
+            hbaseRule.configuration.setStrings(name, values);
+            return this;
+        }
+
         public Builder setCustomConfigs(Map<String, String> customConfigs) {
-            hbaseRule.customConfigs = customConfigs;
+            customConfigs.forEach(hbaseRule.configuration::set);
             return this;
         }
 
