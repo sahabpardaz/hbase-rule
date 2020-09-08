@@ -48,20 +48,20 @@ public class HbaseRule extends ExternalResource {
     protected void before() throws Throwable {
         // Set necessary HBase configuration items.
         configuration.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
-        // Set MASTER_INFO_PORT to a random open port instead of 60010 to avoid conflicts.
-        configuration.set(HConstants.MASTER_INFO_PORT, String.valueOf(anOpenPort()));
-        int zkPort = anOpenPort();
-        configuration.set(HConstants.ZOOKEEPER_QUORUM, "localhost:" + zkPort);
 
         // Create ZooKeeper mini cluster
-        zkCluster = new MiniZooKeeperCluster();
-        zkCluster.addClientPort(zkPort);
         logDir = Files.createTempDirectory("zk-log-dir").toFile();
+        zkCluster = new MiniZooKeeperCluster();
+        int zkPort = anOpenPort();
+        zkCluster.addClientPort(zkPort);
         zkCluster.startup(logDir);
+        configuration.set(HConstants.ZOOKEEPER_QUORUM, "localhost:" + zkPort);
 
         // Create and start mini cluster
         utility = new HBaseTestingUtility(configuration);
         utility.setZkCluster(zkCluster);
+        // Set MASTER_INFO_PORT to a random open port instead of 60010 to avoid conflicts.
+        configuration.set(HConstants.MASTER_INFO_PORT, String.valueOf(anOpenPort()));
         utility.startMiniCluster();
 
         // Create defined namespaces and tables.
