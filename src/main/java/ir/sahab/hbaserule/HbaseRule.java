@@ -57,9 +57,21 @@ public class HbaseRule extends ExternalResource {
         // Create and start HBase mini cluster
         utility = new HBaseTestingUtility(configuration);
         utility.setZkCluster(zkCluster);
-        configuration.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
-        // Set MASTER_INFO_PORT to a random open port instead of 60010 to avoid conflicts.
-        configuration.set(HConstants.MASTER_INFO_PORT, String.valueOf(anOpenPort()));
+        configuration.setInt(HConstants.HBASE_CLIENT_RETRIES_NUMBER, 1);
+        // We disable info servers to increase the speed of work and prevent contention for ports.
+        // This approach has even been used in the HBase tests too.
+        // Note: In the configuration properties, default value for {@link HConstants.MASTER_PORT} and
+        //       {@link HConstants#REGIONSERVER_PORT} and {@link HConstants#REGIONSERVER_INFO_PORT} are
+        //       overridden with 0 so a random port will be assigned (Based on the implementation of
+        //       {@link HttpServer}, HBase starts from a specific port and increment it by 1 until finds
+        //       a free port)
+        //       However HBase mini cluster doesn't override {@link HConstants#MASTER_INFO_PORT}!!
+        //       (See {@link LocalHBaseCluster#Constructor(Configuration configuration)})
+        // Note: {@link HConstants#REGIONSERVER_INFO_PORT} and {@link HConstants#MASTER_INFO_PORT} are
+        //       for Hadoop web UIs. It is possible to disable info severs by providing -1 as port.
+        //       (See {@link HRegionServer#putUpWebUI})
+        configuration.setInt(HConstants.MASTER_INFO_PORT, -1);
+        configuration.setInt(HConstants.REGIONSERVER_INFO_PORT, -1);
         utility.startMiniCluster();
 
         // Create defined namespaces and tables.
