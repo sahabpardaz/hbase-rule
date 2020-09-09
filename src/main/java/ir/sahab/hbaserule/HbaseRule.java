@@ -57,9 +57,14 @@ public class HbaseRule extends ExternalResource {
         // Create and start HBase mini cluster
         utility = new HBaseTestingUtility(configuration);
         utility.setZkCluster(zkCluster);
-        configuration.set(HConstants.HBASE_CLIENT_RETRIES_NUMBER, "1");
-        // Set MASTER_INFO_PORT to a random open port instead of 60010 to avoid conflicts.
-        configuration.set(HConstants.MASTER_INFO_PORT, String.valueOf(anOpenPort()));
+        configuration.setInt(HConstants.HBASE_CLIENT_RETRIES_NUMBER, 1);
+        // We disable info servers for two reasons:
+        // 1. In tests, we do not need UI dashboards. So we can ignore it and speed up the launch time.
+        // 2. When we assign an open port for these servers, because there is a delay involved (on starting
+        //    the HBase mini-cluster, it first launches data nodes and region servers), the port may be used
+        //    by another application and no longer available.
+        configuration.setInt(HConstants.MASTER_INFO_PORT, -1);
+        configuration.setInt(HConstants.REGIONSERVER_INFO_PORT, -1);
         utility.startMiniCluster();
 
         // Create defined namespaces and tables.
