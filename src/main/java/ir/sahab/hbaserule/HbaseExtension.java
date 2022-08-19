@@ -18,6 +18,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * JUnit 5 extension which provides a mini cluster of Hbase, DFS, and ZooKeeper.
+ */
 public class HbaseExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback {
 
     public static final TestInstance.Lifecycle lifecycle = TestInstance.Lifecycle.PER_CLASS;

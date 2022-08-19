@@ -23,7 +23,10 @@ class HbaseExtensionTest {
     private static final String COLUMN_FAMILY = "cf";
 
     @RegisterExtension
-    static HbaseExtension hbaseExtension = HbaseExtension.newBuilder().addNameSpace(NAME_SPACE).addTable(TABLE_ON_BUILDER, COLUMN_FAMILY).build();
+    static HbaseExtension hbaseExtension = HbaseExtension.newBuilder()
+            .addNameSpace(NAME_SPACE)
+            .addTable(TABLE_ON_BUILDER, COLUMN_FAMILY)
+            .build();
 
     @BeforeAll
     static void setUp() throws Exception {

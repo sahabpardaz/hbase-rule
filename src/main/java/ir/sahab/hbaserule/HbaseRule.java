@@ -1,22 +1,7 @@
 package ir.sahab.hbaserule;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HBaseTestingUtility;
-import org.apache.hadoop.hbase.HConstants;
-import org.apache.hadoop.hbase.NamespaceDescriptor;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -24,8 +9,16 @@ import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.rules.ExternalResource;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
 /**
- * JUnit rule which provides a mini cluster of Hbase, DFS, and ZooKeeper.
+ * JUnit 4 rule which provides a mini cluster of Hbase, DFS, and ZooKeeper.
  */
 public class HbaseRule extends ExternalResource {
 
@@ -37,11 +30,19 @@ public class HbaseRule extends ExternalResource {
     private List<String> nameSpaces = new ArrayList<>();
     private List<HBaseTableDef> hBaseTableDefs = new ArrayList<>();
 
+    private HbaseRule() {
+    }
+
     public static Builder newBuilder() {
         return new Builder();
     }
 
-    private HbaseRule() {
+    static Integer anOpenPort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new AssertionError("Unable to find an open port.", e);
+        }
     }
 
     @Override
@@ -219,14 +220,6 @@ public class HbaseRule extends ExternalResource {
 
     public void truncateTable(TableName tableName) throws IOException {
         utility.truncateTable(tableName).close();
-    }
-
-    static Integer anOpenPort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            throw new AssertionError("Unable to find an open port.", e);
-        }
     }
 
     /**

@@ -66,6 +66,34 @@ public void test() throws Exception {
 }
 ```
 
+## JUnit 5 Support
+In case of using Junit 5, You can use HbaseExtension extension like this:
+
+```java
+@RegisterExtension
+static HbaseExtension hbaseExtension = HbaseExtension.newBuilder()
+        .addNameSpace("namespace")
+        .addTable("table", "cf")
+        .build();
+
+@BeforeAll
+static void setUp() throws Exception {
+    hbaseExtension.createTable("table", "cf");
+}
+
+@Test
+void test() throws Exception {
+        ...
+
+        // You expect number of rows already put in HBase table.
+        assertEquals(10 , hbaseExtension.countRows("tableOnBuilder"));
+        // Delete table data.
+        hbaseExtension.deleteTableData("table");
+        // You expect 0 rows in HBase table after cleaning.
+        assertEquals(0, hbaseExtension.countRows("table"));
+        }
+```
+
 ### Add it to your project
 
 You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
