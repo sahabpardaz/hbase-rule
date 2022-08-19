@@ -16,6 +16,14 @@
     </repositories>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!--        Sonar settings        -->
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>sahabpardaz</sonar.organization>
+        <sonar.projectKey>sahabpardaz_hbase-rule</sonar.projectKey>
+
         <cloudera.hadoop.version>2.6.0-cdh5.10.2</cloudera.hadoop.version>
         <cloudera.hbase.version>1.2.0-cdh5.10.2</cloudera.hbase.version>
     </properties>
