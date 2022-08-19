@@ -10,17 +10,19 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HbaseExtensionTest {
+class HbaseExtensionTest {
     private static final String NAME_SPACE = "builderNameSpace";
     private static final String TABLE_ON_BUILDER = "tableOnBuilder";
     private static final String TABLE_ON_SETUP = "tableOnSetup";
     private static final String COLUMN_FAMILY = "cf";
 
+    @RegisterExtension
     static HbaseExtension hbaseExtension = HbaseExtension.newBuilder().addNameSpace(NAME_SPACE).addTable(TABLE_ON_BUILDER, COLUMN_FAMILY).build();
 
     @BeforeAll
@@ -43,13 +45,13 @@ public class HbaseExtensionTest {
     }
 
     @Test
-    public void testTableCreatedByBuilder() throws Exception {
+    void testTableCreatedByBuilder() throws Exception {
         checkTablesAreClean();
         checkWriteAndRead(TABLE_ON_BUILDER);
     }
 
     @Test
-    public void testTableCreatedDirectly() throws Exception {
+    void testTableCreatedDirectly() throws Exception {
         checkTablesAreClean();
         checkWriteAndRead(TABLE_ON_SETUP);
     }
