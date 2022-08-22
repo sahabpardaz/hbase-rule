@@ -1,5 +1,9 @@
 ### HBase Rule
-JUnit HBase rule which provides an embedded HBase server. It can be setup by custom configuration or default. The rule has also helper methods to work with hbase table and namespace such as create, delete, truncate and etc.
+
+This library provides Junit 4 Rule and Junit 5 Extension which provides an embedded HBase server.
+It can be setup by custom configuration or default.
+The rule and extension has also helper methods to work with hbase table and namespace such as create,
+delete, truncate and etc.
 
 ### Sample Usage
 
@@ -37,6 +41,7 @@ public void test() throws Exception {
 ```
 
 It's also possible to define table on setup and delete the data on tearDown.
+
 ```java
 @BeforeClass
 public static void setUp() throws Exception {
@@ -67,6 +72,7 @@ public void test() throws Exception {
 ```
 
 ## JUnit 5 Support
+
 In case of using Junit 5, You can use HbaseExtension extension like this:
 
 ```java
@@ -96,11 +102,17 @@ void test() throws Exception {
 
 ### Add it to your project
 
-You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from this jitpack link:
+You can reference to this library by either of java build systems (Maven, Gradle, SBT or Leiningen) using snippets from
+this jitpack link:
 [![](https://jitpack.io/v/sahabpardaz/hbase-rule.svg)](https://jitpack.io/#sahabpardaz/hbase-rule)
 
 But note that you should rewrite all optional dependencies defined in [pom](pom.xml) in pom of your own project too.
-That's because here we have defined dependencies as optional to avoid accidantally changing the type (*original* or *cloudera*, *normal* or *shaded*) and version of your hadoop dependencies.
+That's because here we have defined dependencies as optional to avoid accidantally changing the type (*original* or *
+cloudera*, *normal* or *shaded*) and version of your hadoop dependencies.
 
-If you have used hadoop client libraries, you have already some hadoop dependencies in your project. Now you should provide some other dependencies for hadoop *server* and *test* libraries. Note that you should provide them with the same type and version but in *test* scope.
+If you have used hadoop client libraries, you have already some hadoop dependencies in your project. Now you should
+provide some other dependencies for hadoop *server* and *test* libraries. Note that you should provide them with the
+same type and version but in *test* scope.
 
+JUnit 4 and 5 dependencies are marked as optional, so you need to provide JUnit 4 or 5 dependency
+(based on what version you need, and you use) in you project to make it work.
