@@ -1,40 +1,25 @@
 package ir.sahab.hbaserule;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.*;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.MultipleFailureException;
+import org.junit.runners.model.Statement;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JUnit 4 rule which provides a mini cluster of Hbase, DFS, and ZooKeeper.
  */
-public class HbaseRule extends ExternalResource {
-
-    private Configuration configuration = HBaseConfiguration.create();
-    private HBaseTestingUtility utility;
-    private MiniZooKeeperCluster zkCluster;
-    private File logDir;
-
-    private List<String> nameSpaces = new ArrayList<>();
-    private List<HBaseTableDef> hBaseTableDefs = new ArrayList<>();
+public class HbaseRule extends HbaseBase implements TestRule {
 
     private HbaseRule() {
     }
 
-    public static Builder newBuilder() {
-        return new Builder();
+    public static Builder<HbaseRule> newBuilder() {
+        return new Builder<>(new HbaseRule());
     }
 
     static Integer anOpenPort() {
@@ -45,260 +30,32 @@ public class HbaseRule extends ExternalResource {
         }
     }
 
-    @Override
-    protected void before() throws Throwable {
-        // Create ZooKeeper mini cluster
-        logDir = Files.createTempDirectory("zk-log-dir").toFile();
-        zkCluster = new MiniZooKeeperCluster();
-        int zkPort = anOpenPort();
-        zkCluster.addClientPort(zkPort);
-        zkCluster.startup(logDir);
-        configuration.set(HConstants.ZOOKEEPER_QUORUM, "localhost:" + zkPort);
-
-        // Create and start HBase mini cluster
-        utility = new HBaseTestingUtility(configuration);
-        utility.setZkCluster(zkCluster);
-        configuration.setInt(HConstants.HBASE_CLIENT_RETRIES_NUMBER, 1);
-        // We disable info servers for two reasons:
-        // 1. In tests, we do not need UI dashboards. So we can ignore it and speed up the launch time.
-        // 2. When we assign an open port for these servers, because there is a delay involved (on starting
-        //    the HBase mini-cluster, it first launches data nodes and region servers), the port may be used
-        //    by another application and no longer available.
-        configuration.setInt(HConstants.MASTER_INFO_PORT, -1);
-        configuration.setInt(HConstants.REGIONSERVER_INFO_PORT, -1);
-        utility.startMiniCluster();
-
-        // Create defined namespaces and tables.
-        for (String nameSpace : nameSpaces) {
-            createNamespace(nameSpace);
-        }
-
-        for (HBaseTableDef hBaseTableDef : hBaseTableDefs) {
-            utility.createTable(hBaseTableDef.getTableName(), hBaseTableDef.getColumnFamilies()).close();
-        }
+    //copied from org.junit.rules.ExternalResource
+    public Statement apply(Statement base, Description description) {
+        return statement(base);
     }
 
-    @Override
-    protected void after() {
-        try {
-            utility.shutdownMiniCluster();
-        } catch (Exception e) {
-            throw new AssertionError("Failed to stop mini cluster.", e);
-        }
+    private Statement statement(final Statement base) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                before();
 
-        try {
-            zkCluster.shutdown();
-        } catch (IOException e) {
-            throw new AssertionError("Failed to stop ZooKeeper cluster.", e);
-        }
-
-        try {
-            Files.walk(Paths.get(logDir.getPath()))
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-        } catch (IOException e) {
-            throw new AssertionError("Failed to clear ZooKeeper log directory.", e);
-        }
-    }
-
-    /**
-     * It can be called after the rule is initialized. So you can call it in test method or in corresponding setup
-     * method of the test, but not immediately after rule creation.
-     */
-    public String getZKAddress() {
-        return utility.getConfiguration().get(HConstants.ZOOKEEPER_QUORUM);
-    }
-
-    public Connection getConnection() throws IOException {
-        return utility.getConnection();
-    }
-
-    public HBaseTestingUtility getHBaseTestingUtility() {
-        return utility;
-    }
-
-    public MiniDFSCluster getDfsCluster() {
-        return utility.getDFSCluster();
-    }
-
-    public Configuration getConfiguration() {
-        return utility.getConfiguration();
-    }
-
-    public int countRows(TableName tableName) throws IOException {
-        return utility.countRows(tableName);
-    }
-
-    public int countRows(String tableName) throws IOException {
-        return countRows(TableName.valueOf(tableName));
-    }
-
-    public int countRows(Table table) throws IOException {
-        return utility.countRows(table);
-    }
-
-    public int countRows(Table table, byte[]... columnFamilies) throws IOException {
-        return utility.countRows(table, columnFamilies);
-    }
-
-    public void createNamespace(String nameSpace) throws IOException {
-        utility.getHBaseAdmin().createNamespace(NamespaceDescriptor.create(nameSpace).build());
-    }
-
-    public void createNamespace(NamespaceDescriptor namespace) throws IOException {
-        utility.getHBaseAdmin().createNamespace(namespace);
-    }
-
-    public void createTable(String tableName, String columnFamily) throws IOException {
-        utility.createTable(Bytes.toBytes(tableName), Bytes.toBytes(columnFamily)).close();
-    }
-
-    public void createTable(String tableName, String columnFamily, int numVersions) throws IOException {
-        utility.createTable(Bytes.toBytes(tableName), Bytes.toBytes(columnFamily), numVersions).close();
-    }
-
-    public void createTable(byte[] tableName, byte[] columnFamily) throws IOException {
-        utility.createTable(TableName.valueOf(tableName), columnFamily).close();
-    }
-
-    public void createTable(byte[] tableName, byte[] columnFamily, int numVersions) throws IOException {
-        utility.createTable(TableName.valueOf(tableName), columnFamily, numVersions).close();
-    }
-
-    public void createTable(TableName tableName, byte[] columnFamily) throws IOException {
-        utility.createTable(tableName, columnFamily).close();
-    }
-
-    public void createTable(TableName tableName, byte[] columnFamily, int numVersions) throws IOException {
-        utility.createTable(tableName, columnFamily, numVersions).close();
-    }
-
-    public void createTable(TableName tableName, byte[]... columnFamilies) throws IOException {
-        utility.createTable(tableName, columnFamilies).close();
-    }
-
-    public void createTable(TableName tableName, byte[][] columnFamilies, int[] numVersions) throws IOException {
-        utility.createTable(tableName, columnFamilies, numVersions).close();
-    }
-
-    public void createTable(TableName tableName, String... columnFamilies) throws IOException {
-        utility.createTable(tableName, columnFamilies).close();
-    }
-
-    public void deleteTable(String tableName) throws IOException {
-        utility.deleteTable(tableName);
-    }
-
-    public void deleteTable(byte[] tableName) throws IOException {
-        utility.deleteTable(tableName);
-    }
-
-    public void deleteTable(TableName tableName) throws IOException {
-        utility.deleteTable(tableName);
-    }
-
-    public void deleteTableData(String tableName) throws IOException {
-        deleteTableData(Bytes.toBytes(tableName));
-    }
-
-    public void deleteTableData(byte[] tableName) throws IOException {
-        utility.deleteTableData(tableName).close();
-    }
-
-    public void deleteTableData(TableName tableName) throws IOException {
-        utility.deleteTableData(tableName).close();
-    }
-
-    public void truncateTable(String tableName) throws IOException {
-        truncateTable(Bytes.toBytes(tableName));
-    }
-
-    public void truncateTable(byte[] tableName) throws IOException {
-        utility.truncateTable(tableName).close();
-    }
-
-    public void truncateTable(TableName tableName) throws IOException {
-        utility.truncateTable(tableName).close();
-    }
-
-    /**
-     * The model that represents definition of a Hbase table.
-     */
-    private static class HBaseTableDef {
-
-        private byte[] tableName;
-        private byte[][] columnFamilies;
-
-        public HBaseTableDef(byte[] tableName, byte[][] columnFamilies) {
-            this.tableName = tableName;
-            this.columnFamilies = columnFamilies;
-        }
-
-        public byte[] getTableName() {
-            return tableName;
-        }
-
-        public byte[][] getColumnFamilies() {
-            return columnFamilies;
-        }
-    }
-
-    /**
-     * The builder class to create instance of {@link HbaseRule}.
-     */
-    public static class Builder {
-
-        HbaseRule hbaseRule = new HbaseRule();
-
-        public Builder setCustomConfig(String name, String value) {
-            hbaseRule.configuration.set(name, value);
-            return this;
-        }
-
-        public Builder setCustomConfig(String name, String... values) {
-            hbaseRule.configuration.setStrings(name, values);
-            return this;
-        }
-
-        public Builder setCustomConfigs(Map<String, String> customConfigs) {
-            customConfigs.forEach(hbaseRule.configuration::set);
-            return this;
-        }
-
-        public Builder addNameSpace(String... nameSpaces) {
-            hbaseRule.nameSpaces.addAll(Arrays.asList(nameSpaces));
-            return this;
-        }
-
-        public Builder addNameSpace(byte[]... nameSpaces) {
-            for (byte[] nameSpace : nameSpaces) {
-                hbaseRule.nameSpaces.add(Bytes.toString(nameSpace));
+                List<Throwable> errors = new ArrayList<Throwable>();
+                try {
+                    base.evaluate();
+                } catch (Throwable t) {
+                    errors.add(t);
+                } finally {
+                    try {
+                        after();
+                    } catch (Throwable t) {
+                        errors.add(t);
+                    }
+                }
+                MultipleFailureException.assertEmpty(errors);
             }
-            return this;
-        }
-
-        public Builder addTable(byte[] tableName, byte[]... columnFamilies) {
-            hbaseRule.hBaseTableDefs.add(new HBaseTableDef(tableName, columnFamilies));
-            return this;
-        }
-
-        public Builder addTable(String tableName, String... columnFamilies) {
-            byte[][] columnFamiliesBytes = new byte[columnFamilies.length][];
-            for (int i = 0; i < columnFamilies.length; i++) {
-                columnFamiliesBytes[i] = Bytes.toBytes(columnFamilies[i]);
-            }
-            hbaseRule.hBaseTableDefs.add(new HBaseTableDef(Bytes.toBytes(tableName), columnFamiliesBytes));
-            return this;
-        }
-
-        public Builder addTable(TableName tableName, byte[]... columnFamilies) {
-            hbaseRule.hBaseTableDefs.add(new HBaseTableDef(tableName.getName(), columnFamilies));
-            return this;
-        }
-
-        public HbaseRule build() {
-            return hbaseRule;
-        }
+        };
     }
+
 }
