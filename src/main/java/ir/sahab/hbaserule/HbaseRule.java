@@ -41,7 +41,7 @@ public class HbaseRule extends HbaseBase implements TestRule {
             public void evaluate() throws Throwable {
                 before();
 
-                List<Throwable> errors = new ArrayList<Throwable>();
+                List<Throwable> errors = new ArrayList<>();
                 try {
                     base.evaluate();
                 } catch (Throwable t) {
