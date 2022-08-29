@@ -1,9 +1,6 @@
 package ir.sahab.hbaserule;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -12,11 +9,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import java.io.IOException;
-
+import static ir.sahab.hbaserule.HbaseBase.createConnection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class HbaseExtensionTest {
+
     private static final String NAME_SPACE = "builderNameSpace";
     private static final String TABLE_ON_BUILDER = "tableOnBuilder";
     private static final String TABLE_ON_SETUP = "tableOnSetup";
@@ -31,14 +28,6 @@ class HbaseExtensionTest {
     @BeforeAll
     static void setUp() throws Exception {
         hbaseExtension.createTable(TABLE_ON_SETUP, COLUMN_FAMILY);
-    }
-
-    static Connection createConnection(String zkAddresses, int operationTimeout) throws IOException {
-        // Create HBase client config
-        Configuration hbaseConf = HBaseConfiguration.create();
-        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, zkAddresses);
-        hbaseConf.setInt(HConstants.HBASE_RPC_TIMEOUT_KEY, operationTimeout);
-        return ConnectionFactory.createConnection(hbaseConf);
     }
 
     @AfterEach

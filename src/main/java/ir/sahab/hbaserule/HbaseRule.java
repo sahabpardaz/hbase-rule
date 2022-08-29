@@ -5,8 +5,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,14 +18,6 @@ public class HbaseRule extends HbaseBase implements TestRule {
 
     public static Builder<HbaseRule> newBuilder() {
         return new Builder<>(new HbaseRule());
-    }
-
-    static Integer anOpenPort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (IOException e) {
-            throw new AssertionError("Unable to find an open port.", e);
-        }
     }
 
     //copied from org.junit.rules.ExternalResource

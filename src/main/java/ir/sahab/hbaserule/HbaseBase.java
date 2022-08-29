@@ -3,6 +3,7 @@ package ir.sahab.hbaserule;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.Connection;
+import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
@@ -19,6 +20,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Base class for creating an embeddable Hbase server.
+ * It also provides some methods for easier access to the Hbase server.
+ */
 abstract class HbaseBase {
 
     Configuration configuration = HBaseConfiguration.create();
@@ -32,7 +37,6 @@ abstract class HbaseBase {
     HbaseBase() {
     }
 
-
     static Integer anOpenPort() {
         try (ServerSocket socket = new ServerSocket(0)) {
             return socket.getLocalPort();
@@ -41,6 +45,13 @@ abstract class HbaseBase {
         }
     }
 
+    public static Connection createConnection(String zkAddresses, int operationTimeout) throws IOException {
+        // Create HBase client config
+        Configuration hbaseConf = HBaseConfiguration.create();
+        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, zkAddresses);
+        hbaseConf.setInt(HConstants.HBASE_RPC_TIMEOUT_KEY, operationTimeout);
+        return ConnectionFactory.createConnection(hbaseConf);
+    }
 
     @SuppressWarnings("java:S5443")
     protected void before() throws Exception {
@@ -224,8 +235,8 @@ abstract class HbaseBase {
      */
     static class HBaseTableDef {
 
-        private byte[] tableName;
-        private byte[][] columnFamilies;
+        private final byte[] tableName;
+        private final byte[][] columnFamilies;
 
         public HBaseTableDef(byte[] tableName, byte[][] columnFamilies) {
             this.tableName = tableName;
@@ -240,6 +251,5 @@ abstract class HbaseBase {
             return columnFamilies;
         }
     }
-
 
 }

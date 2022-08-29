@@ -18,7 +18,6 @@ public class HbaseExtension extends HbaseBase
         return new Builder<>(new HbaseExtension());
     }
 
-
     @Override
     public void afterAll(ExtensionContext context) {
         if (lifecycle == TestInstance.Lifecycle.PER_CLASS) {

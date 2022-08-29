@@ -6,6 +6,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Builder class for building {@link HbaseExtension} and {@link HbaseRule}
+ *
+ * @param <T> {@link HbaseExtension} or {@link HbaseRule}
+ */
 class Builder<T extends HbaseBase> {
 
 

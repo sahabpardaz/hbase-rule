@@ -1,23 +1,12 @@
 package ir.sahab.hbaserule;
 
-import java.io.IOException;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
+
+import static ir.sahab.hbaserule.HbaseBase.createConnection;
 
 public class HbaseRuleTest {
 
@@ -87,14 +76,6 @@ public class HbaseRuleTest {
 
         // Test counting the rows
         Assert.assertEquals(numRecords, hbaseRule.countRows(tableName));
-    }
-
-    static Connection createConnection(String zkAddresses, int operationTimeout) throws IOException {
-        // Create HBase client config
-        Configuration hbaseConf = HBaseConfiguration.create();
-        hbaseConf.set(HConstants.ZOOKEEPER_QUORUM, zkAddresses);
-        hbaseConf.setInt(HConstants.HBASE_RPC_TIMEOUT_KEY, operationTimeout);
-        return ConnectionFactory.createConnection(hbaseConf);
     }
 
     private void checkTablesAreClean() throws Exception {
