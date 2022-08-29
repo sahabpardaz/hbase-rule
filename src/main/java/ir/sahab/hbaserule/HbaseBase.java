@@ -41,6 +41,8 @@ abstract class HbaseBase {
         }
     }
 
+
+    @SuppressWarnings("java:S5443")
     protected void before() throws Exception {
         // Create ZooKeeper mini cluster
         logDir = Files.createTempDirectory("zk-log-dir").toFile();
