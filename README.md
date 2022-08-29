@@ -1,5 +1,16 @@
 ### HBase Rule
 
+[![Tests](https://github.com/sahabpardaz/hbase-rule/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/sahabpardaz/hbase-rule/actions/workflows/maven.yml)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=coverage)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=security_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=sqale_index)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=sahabpardaz_hbase-rule&metric=alert_status)](https://sonarcloud.io/dashboard?id=sahabpardaz_hbase-rule)
+[![JitPack](https://jitpack.io/v/sahabpardaz/hbase-rule.svg)](https://jitpack.io/#sahabpardaz/hbase-rule)
+
 This library provides Junit 4 Rule and Junit 5 Extension which provides an embedded HBase server.
 It can be setup by custom configuration or default.
 The rule and extension has also helper methods to work with hbase table and namespace such as create,
