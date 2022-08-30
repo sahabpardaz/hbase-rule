@@ -20,7 +20,6 @@ public class HbaseRule extends HbaseBase implements TestRule {
         return new Builder<>(new HbaseRule());
     }
 
-    //copied from org.junit.rules.ExternalResource
     public Statement apply(Statement base, Description description) {
         return statement(base);
     }

@@ -13,7 +13,6 @@ import java.util.Map;
  */
 class Builder<T extends HbaseBase> {
 
-
     T hbase;
 
     Builder(T initial) {
@@ -69,6 +68,5 @@ class Builder<T extends HbaseBase> {
     public T build() {
         return hbase;
     }
-
 
 }
