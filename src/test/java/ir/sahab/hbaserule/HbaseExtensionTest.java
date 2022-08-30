@@ -4,42 +4,46 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static ir.sahab.hbaserule.HbaseBase.createConnection;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HbaseRuleTest {
+class HbaseExtensionTest {
 
     private static final String NAME_SPACE = "builderNameSpace";
     private static final String TABLE_ON_BUILDER = "tableOnBuilder";
     private static final String TABLE_ON_SETUP = "tableOnSetup";
     private static final String COLUMN_FAMILY = "cf";
 
-    @ClassRule
-    public static HbaseRule hbaseRule = HbaseRule.newBuilder()
+    @RegisterExtension
+    static HbaseExtension hbaseExtension = HbaseExtension.newBuilder()
             .addNameSpace(NAME_SPACE)
             .addTable(TABLE_ON_BUILDER, COLUMN_FAMILY)
             .build();
 
-    @BeforeClass
-    public static void setUp() throws Exception {
-        hbaseRule.createTable(TABLE_ON_SETUP, COLUMN_FAMILY);
+    @BeforeAll
+    static void setUp() throws Exception {
+        hbaseExtension.createTable(TABLE_ON_SETUP, COLUMN_FAMILY);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        hbaseRule.deleteTableData(TABLE_ON_BUILDER);
-        hbaseRule.deleteTableData(TABLE_ON_SETUP);
+    @AfterEach
+    void tearDown() throws Exception {
+        hbaseExtension.deleteTableData(TABLE_ON_BUILDER);
+        hbaseExtension.deleteTableData(TABLE_ON_SETUP);
     }
 
     @Test
-    public void testTableCreatedByBuilder() throws Exception {
+    void testTableCreatedByBuilder() throws Exception {
         checkTablesAreClean();
         checkWriteAndRead(TABLE_ON_BUILDER);
     }
 
     @Test
-    public void testTableCreatedDirectly() throws Exception {
+    void testTableCreatedDirectly() throws Exception {
         checkTablesAreClean();
         checkWriteAndRead(TABLE_ON_SETUP);
     }
@@ -47,8 +51,7 @@ public class HbaseRuleTest {
     private void checkWriteAndRead(String tableName) throws Exception {
 
         int numRecords = 100;
-        try (Connection hbaseConnection = createConnection(hbaseRule.getZKAddress(), 3000);
-                Table table = hbaseConnection.getTable(TableName.valueOf(tableName))) {
+        try (Connection hbaseConnection = createConnection(hbaseExtension.getZKAddress(), 3000); Table table = hbaseConnection.getTable(TableName.valueOf(tableName))) {
 
             // Put some data to hbase table.
             String prefixRowKey = "rowKey";
@@ -66,20 +69,19 @@ public class HbaseRuleTest {
                 get.addColumn(Bytes.toBytes(COLUMN_FAMILY), Bytes.toBytes(qualifier));
                 Result result = table.get(get);
                 for (Cell cell : result.listCells()) {
-                    Assert.assertEquals(prefixRowKey + i,
-                            Bytes.toString(cell.getRowArray(), cell.getRowOffset(), cell.getRowLength()));
-                    Assert.assertEquals(prefixValue + i,
-                            Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
+                    assertEquals(prefixRowKey + i, Bytes.toString(cell.getRowArray(), cell.getRowOffset(), cell.getRowLength()));
+                    assertEquals(prefixValue + i, Bytes.toString(cell.getValueArray(), cell.getValueOffset(), cell.getValueLength()));
                 }
             }
         }
 
         // Test counting the rows
-        Assert.assertEquals(numRecords, hbaseRule.countRows(tableName));
+        assertEquals(numRecords, hbaseExtension.countRows(tableName));
     }
 
     private void checkTablesAreClean() throws Exception {
-        Assert.assertEquals(0, hbaseRule.countRows(TABLE_ON_BUILDER));
-        Assert.assertEquals(0, hbaseRule.countRows(TABLE_ON_SETUP));
+        assertEquals(0, hbaseExtension.countRows(TABLE_ON_BUILDER));
+        assertEquals(0, hbaseExtension.countRows(TABLE_ON_SETUP));
     }
+
 }
