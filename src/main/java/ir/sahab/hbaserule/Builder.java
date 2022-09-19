@@ -11,7 +11,7 @@ import java.util.Map;
  *
  * @param <T> {@link HbaseExtension} or {@link HbaseRule}
  */
-class Builder<T extends HbaseBase> {
+public class Builder<T extends HbaseBase> {
 
     T hbase;
 
